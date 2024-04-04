@@ -21,14 +21,14 @@ data = data.drop('Sedentary Hours Per Day', axis=1)
 data['Age'] = data['Age'].round(-1) # Rounds age to 10
 
 
-# Makes country counts data frame for map
+# Makes country counts data frame for world map
 columns = list(data.columns)
 
 country_data = data.loc[:, ['Country']]
 country_data = country_data.groupby(['Country']).size().reset_index(name='Count')
 
 
-# Data for regression plot and png
+# Data for regression plot and rfr png
 df_raw = pd.read_csv("heart_attack_prediction_dataset.csv")
 x_feat_list = ['Age', 'Sex', 'Cholesterol',
                'Heart Rate', 'Diabetes', 'Family History', 'Smoking', 'Obesity',
@@ -50,13 +50,13 @@ df_raw['Diet'] = df_raw['Diet'].map(diet_mapping)
 from sklearn.ensemble import RandomForestRegressor
 
 x = df_raw.loc[:, x_feat_list].values
-# prices (target)
+# previous heart probelems (target)
 y = df_raw['Previous Heart Problems']
 
 rfr = RandomForestRegressor()
 rfr.fit(x, y)
 
-
+# Function to plot RFR data (feature importance)
 def plot_feat_import(feat_list, feat_import, sort=True, limit=None):
     if sort:
         idx = np.argsort(feat_import).astype(int)
@@ -80,6 +80,6 @@ def plot_feat_import(feat_list, feat_import, sort=True, limit=None):
 # Generate the RFR plot and convert to png
 plt_obj = plot_feat_import(x_feat_list, rfr.feature_importances_)
 
-
+# Generate encoded_image variable for use by dashboard
 with open('feature_importance.png', 'rb') as image_file:
     encoded_image = base64.b64encode(image_file.read()).decode()
